@@ -468,8 +468,9 @@
     console.log("🔍 Verificando URL:", url);
     console.log("🔍 Pathname:", pathname);
     
-    // Verifica se está numa subconta - pode ser /location/ ou /locations/
-    const isSubAccount = pathname.includes('/location') && !pathname.includes('/agency');
+    // ✅ SUBCONTA: domínio/v2/location/ID/página
+    // ❌ AGÊNCIA: domínio/página (sem v2/location)
+    const isSubAccount = pathname.includes('/v2/location/');
     
     console.log("🎯 É subconta?", isSubAccount);
     return isSubAccount;
