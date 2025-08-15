@@ -460,11 +460,29 @@
     return btn;
   }
 
+  // ⭐ NOVA função para verificar se está em subconta
+  function isInSubAccount() {
+    const url = location.href;
+    const pathname = location.pathname;
+    
+    console.log("🔍 Verificando URL:", url);
+    console.log("🔍 Pathname:", pathname);
+    
+    // Verifica se está numa subconta - pode ser /location/ ou /locations/
+    const isSubAccount = pathname.includes('/location') && !pathname.includes('/agency');
+    
+    console.log("🎯 É subconta?", isSubAccount);
+    return isSubAccount;
+  }
+
   function addButton() {
-    // ⭐ NOVO: Só exibe o botão se estiver em uma subconta (URL contém "location")
-    if (!location.href.includes('location')) {
+    // ⭐ VERIFICAÇÃO mais específica para subconta
+    if (!isInSubAccount()) {
+      console.log("❌ Não está em subconta - botão não será adicionado");
       return false;
     }
+    
+    console.log("✅ Está em subconta - adicionando botão");
     
     const header = findHeader();
     if (!header) return false;
@@ -493,12 +511,16 @@
   setInterval(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
+      console.log("🔄 Mudança de URL detectada:", location.href);
+      
       if (popup) closePopup();
       
       // ⭐ MELHORADO: Remove o botão se não estiver mais em uma subconta
-      if (!location.href.includes('location')) {
+      if (!isInSubAccount()) {
+        console.log("🗑️ Removendo botão - não está mais em subconta");
         removeBtn();
       } else {
+        console.log("🔄 Recarregando botão - ainda em subconta");
         removeBtn(); 
         addButton();
       }
@@ -507,8 +529,12 @@
 
   const mo = new MutationObserver(() => { 
     // ⭐ MELHORADO: Só tenta adicionar o botão se estiver em subconta
-    if (location.href.includes('location') && !document.getElementById(BTN_ID)) {
+    if (isInSubAccount() && !document.getElementById(BTN_ID)) {
+      console.log("🔧 MutationObserver: tentando adicionar botão");
       addButton();
+    } else if (!isInSubAccount() && document.getElementById(BTN_ID)) {
+      console.log("🔧 MutationObserver: removendo botão - não está em subconta");
+      removeBtn();
     }
   });
   mo.observe(document.documentElement, { 
@@ -517,19 +543,20 @@
   });
 
   // ⭐ MELHORADO: Inicialização mais robusta - só se estiver em subconta
-  if (location.href.includes('location')) {
+  if (isInSubAccount()) {
+    console.log("🚀 Iniciando em subconta - adicionando botão");
     const startIv = setInterval(() => { 
       if (addButton()) {
         clearInterval(startIv);
-        console.log("Botão de suporte adicionado com sucesso na subconta");
+        console.log("✅ Botão de suporte adicionado com sucesso na subconta");
       }
     }, 100);
     
     setTimeout(() => {
       clearInterval(startIv);
-      console.log("Timeout de inicialização do botão atingido");
+      console.log("⏰ Timeout de inicialização do botão atingido");
     }, 15000);
   } else {
-    console.log("Não está em subconta - botão não será adicionado");
+    console.log("🏢 Não está em subconta - botão não será adicionado");
   }
 })();
