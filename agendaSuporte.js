@@ -461,6 +461,11 @@
   }
 
   function addButton() {
+    // ⭐ NOVO: Só exibe o botão se estiver em uma subconta (URL contém "location")
+    if (!location.href.includes('location')) {
+      return false;
+    }
+    
     const header = findHeader();
     if (!header) return false;
     if (document.getElementById(BTN_ID)) return true;
@@ -489,29 +494,42 @@
     if (location.href !== lastUrl) {
       lastUrl = location.href;
       if (popup) closePopup();
-      removeBtn(); 
-      addButton();
+      
+      // ⭐ MELHORADO: Remove o botão se não estiver mais em uma subconta
+      if (!location.href.includes('location')) {
+        removeBtn();
+      } else {
+        removeBtn(); 
+        addButton();
+      }
     }
   }, 500);
 
   const mo = new MutationObserver(() => { 
-    if (!document.getElementById(BTN_ID)) addButton(); 
+    // ⭐ MELHORADO: Só tenta adicionar o botão se estiver em subconta
+    if (location.href.includes('location') && !document.getElementById(BTN_ID)) {
+      addButton();
+    }
   });
   mo.observe(document.documentElement, { 
     childList: true, 
     subtree: true 
   });
 
-  // ⭐ MELHORADO: Inicialização mais robusta
-  const startIv = setInterval(() => { 
-    if (addButton()) {
+  // ⭐ MELHORADO: Inicialização mais robusta - só se estiver em subconta
+  if (location.href.includes('location')) {
+    const startIv = setInterval(() => { 
+      if (addButton()) {
+        clearInterval(startIv);
+        console.log("Botão de suporte adicionado com sucesso na subconta");
+      }
+    }, 100);
+    
+    setTimeout(() => {
       clearInterval(startIv);
-      console.log("Botão de suporte adicionado com sucesso");
-    }
-  }, 100);
-  
-  setTimeout(() => {
-    clearInterval(startIv);
-    console.log("Timeout de inicialização do botão atingido");
-  }, 15000);
+      console.log("Timeout de inicialização do botão atingido");
+    }, 15000);
+  } else {
+    console.log("Não está em subconta - botão não será adicionado");
+  }
 })();
