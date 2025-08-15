@@ -1,5 +1,4 @@
 <!-- Support Booking - Topbar com popup/iframe (responsivo) -->
-<script>
 (function () {
   const BTN_ID        = "ff-support-topbar-btn";
   const POPUP_ID      = "ff-support-popup";
@@ -266,4 +265,3 @@
   const startIv = setInterval(() => { if (addButton()) clearInterval(startIv); }, 100);
   setTimeout(() => clearInterval(startIv), 15000);
 })();
-</script>
